@@ -1,14 +1,15 @@
 vhod = [[0, 1, 0, 0, 1, 1, 1], [0, 1, 1, 1, 1, 0, 0], [1, 1, 1, 0, 0, 1, 0]]
 a = []
-vvod=[0,0,1,1,1,1,1]
+kod_sekt=[0,1,1,1,0,1,1]
 #while True:
     #a = [int(x) for x in input().split()]
     #if a == []:
         #break
     #vhod.append(a)
 #print(vhod)
-pam = {}
-zam = {}
+matr = {}
+I_k={}
+P = {}
 stolb = [x for x in range(len(vhod[0]))][-1:len(vhod):-1]
 stro=[x for x in range(len(vhod))][::-1]
 pos_in_matr={stolb[i] : stro[i] for i in range(len(stro))}
@@ -16,53 +17,66 @@ for i in range(len(vhod[0])):
     kol = []
     for el in vhod:
         kol.append(el[i])
-    pam[i]=kol
-pos=0
-kl=0
-for i in range(len(pam)-1,-1,-1):
-    if pam[i].count(1)==1:
+    matr[i]=kol
+stolb_c=stolb
+for i in matr.keys():
+    if matr[i].count(1)==1 and matr[i].index(1) in stolb_c:
+        stolb_c.pop(matr[i].index(1))
+if len(stolb_c)!=0:
+    exit()
+for i in range(len(matr)-1,-1,-1):
+    if matr[i].count(1)==1:
         if i in pos_in_matr.keys():
-            if pam[i].index(1)==pos_in_matr[i]:
+            if matr[i].index(1)==pos_in_matr[i]:
                 continue
             else:
-                i1 = list(pos_in_matr.keys())[list(pos_in_matr.values()).index(pam[i].index(1))]
-                p1 = pam.pop(i1)
+                i1 = list(pos_in_matr.keys())[list(pos_in_matr.values()).index(matr[i].index(1))]
+                p1 = matr.pop(i1)
                 i2 = i
-                p2 = pam.pop(i2)
-                pam[i2] = p1
-                pam[i1] = p2
-                pam = dict(sorted(pam.items()))
+                p2 = matr.pop(i2)
+                matr[i2] = p1
+                matr[i1] = p2
+                matr = dict(sorted(matr.items()))
         else:
-            i1=list(pos_in_matr.keys())[list(pos_in_matr.values()).index(pam[i].index(1))]
-            p1=pam.pop(i1)
+            i1=list(pos_in_matr.keys())[list(pos_in_matr.values()).index(matr[i].index(1))]
+            p1=matr.pop(i1)
             i2=i
-            p2=pam.pop(i2)
-            pam[i2]=p1
-            pam[i1]=p2
-            pam=dict(sorted(pam.items()))
+            p2=matr.pop(i2)
+            matr[i2]=p1
+            matr[i1]=p2
+            matr=dict(sorted(matr.items()))
     else:
         continue
 kol_in_sl=2**(len(vhod[0])-len(vhod))
-zam=list(pam.values())[:len(vhod[0])-len(vhod)]
-pam=list(pam.values())[len(vhod[0])-len(vhod):]
-H_sys_t=zam+pam
+P=list(matr.values())[:len(vhod[0])-len(vhod)]
+I_k=list(matr.values())[len(vhod[0])-len(vhod):]
 H_sys=[]
 for i in range(len(vhod)):
     str_tr=[]
-    for j in range(len(H_sys_t)):
-        str_tr.append(H_sys_t[j][i])
+    for j in range(len(P)):
+        str_tr.append(P[j][i])
+    for j in range(len(I_k)):
+        str_tr.append(I_k[j][i])
     H_sys.append(str_tr)
-for i in range(len(pam)):
-    pov=len(zam)-len(pam[i])
+H_sys_t=[]
+for i in range(len(H_sys[0])):
+    str_tr=[]
+    for j in range(len(H_sys)):
+        str_tr.append(H_sys[j][i])
+    H_sys_t.append(str_tr)
+for i in range(len(I_k)):
+    pov=len(P)-len(I_k[i])
     while pov!=0:
-        pam[i].append(0)
+        I_k[i].append(0)
         pov-=1
-while len(pam)!=len(zam):
-    for i in range(len(zam)-len(pam)):
-        new_str=[0]*len(zam)
-        new_str[zam.index(zam[-1])]=1
-        pam.append(new_str)
-G_sys=[pam[i]+zam[i] for i in range(len(pam))]
+while len(I_k)!=len(P):
+    for i in range(len(P)-len(I_k)):
+        new_str=[0]*len(P)
+        new_str[P.index(P[-1])]=1
+        I_k.append(new_str)
+G_sys=[]
+for i in range(len(vhod[0])-len(vhod)):
+    G_sys.append(I_k[i]+P[i])
 inf_sl = ['{0:b}'.format(x) for x in range(kol_in_sl)]
 for i in range(len(inf_sl)):
     if len(inf_sl[i]) < max(len(y) for y in inf_sl):
@@ -117,7 +131,7 @@ for i in range(len(H_sys_t[0])):
     kol = 0
     pov = 0
     for j in range(len(H_sys_t)):
-        if H_sys_t[j][i] == vvod[pov] and H_sys_t[j][i] == 1:
+        if H_sys_t[j][i] == kod_sekt[pov] and H_sys_t[j][i] == 1:
             kol += 1
         pov += 1
     if kol % 2 != 0:
@@ -125,10 +139,13 @@ for i in range(len(H_sys_t[0])):
     else:
         s.append(0)
 if s.count(1)==0:
-    print(list(tabl_kod_sl.keys())[list(tabl_kod_sl.values()).index(''.join(map(str, vvod)))])
+    print(list(tabl_kod_sl.keys())[list(tabl_kod_sl.values()).index(''.join(map(str, kod_sekt)))])
 else:
-    print(s)
-    c = bin(int(''.join(map(str, vvod)), 2) + int(''.join(map(str, D[''.join(map(str, s))])), 2))
-    c = '0' * (len(vekt_osh[0]) - len(c[2:])) + c[2:]
-    print(list(tabl_kod_sl.keys())[list(tabl_kod_sl.values()).index(c)])
-print(syndr)
+    syn=list(D[''.join(map(str, s))])
+    kod_sll=[]
+    for i in range(len(kod_sekt)):
+        if int(kod_sekt[i])!=int(syn[i]):
+            kod_sll.append(1)
+        else:
+            kod_sll.append(0)
+    print(list(tabl_kod_sl.keys())[list(tabl_kod_sl.values()).index(''.join(map(str,kod_sll)))])
